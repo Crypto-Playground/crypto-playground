@@ -1,0 +1,21 @@
+{
+    "name": "eth1",
+    "private": true,
+    "version": "0.0.1",
+    "description": "sandbox/playground for dave to toy with eth tech",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Dave Peck <dave@psl.com>",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/chai": "^4.2.21",
+        "@types/mocha": "^9.0.0",
+        "@types/node": "^16.9.1",
+        "chai": "^4.3.4",
+        "hardhat": "^2.6.4",
+        "ts-node": "^10.2.1",
+        "typescript": "^4.4.3"
+    }
+}
