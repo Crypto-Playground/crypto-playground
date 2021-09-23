@@ -42,9 +42,12 @@ Frontend-related:
 
 Sure. I've deployed the front-end here: (XXX TODO where did I deploy it?)
 
-You can also run it locally:
+You can also run it locally. From the `penny/` directory:
 
 ```
+# Run the tests to make sure there's a sane environment
+npm run test:penny
+
 # Run a local blockchain
 npx hardhat node
 
@@ -52,7 +55,7 @@ npx hardhat node
 npx hardhat scripts/deploy-penny-jar.ts --network localhost
 
 # Bundle and run frontend
-npm run dev
+npm run dev:penny
 ```
 
 When running locally, you'll want to configure MetaMask to talk to the localhost blockchain. Add a new "Custom RPC" network in the MetaMask UI, with `http://localhost:8545/` as the URL for the JSON-RPC endpoint, and `31337` as the associated `chainId`.

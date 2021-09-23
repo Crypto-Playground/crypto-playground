@@ -1,27 +1,28 @@
 {
-    "name": "eth1",
-    "private": true,
-    "version": "0.0.1",
-    "description": "sandbox/playground for dave to toy with eth tech",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Dave Peck <dave@psl.com>",
-    "license": "MIT",
-    "devDependencies": {
-        "@nomiclabs/hardhat-ethers": "^2.0.2",
-        "@nomiclabs/hardhat-waffle": "^2.0.1",
-        "@types/chai": "^4.2.21",
-        "@types/mocha": "^9.0.0",
-        "@types/node": "^16.9.1",
-        "chai": "^4.3.4",
-        "esbuild": "^0.13.2",
-        "ethereum-waffle": "^3.4.0",
-        "ethers": "^5.4.6",
-        "hardhat": "^2.6.4",
-        "solc": "^0.8.7-fixed",
-        "ts-node": "^10.2.1",
-        "typescript": "^4.4.3"
-    }
+  "name": "crypto-playground",
+  "private": true,
+  "version": "0.0.1",
+  "description": "sandbox/playground for dave to toy with crypto tech",
+  "scripts": {
+    "test:penny": "cd penny && npx hardhat test",
+    "build:penny": "echo \"TODO dave\"",
+    "dev:penny": "cd penny && npx esbuild src/penny.ts --servedir=public --outdir=public/js --bundle"
+  },
+  "author": "Dave Peck <davepeck@davepeck.org>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@types/chai": "^4.2.21",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.9.1",
+    "chai": "^4.3.4",
+    "esbuild": "^0.13.2",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.6",
+    "hardhat": "^2.6.4",
+    "solc": "^0.8.7-fixed",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  }
 }

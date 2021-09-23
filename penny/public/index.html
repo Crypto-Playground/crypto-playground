@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Penny Jar example dApp</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        line-height: 1.5em;
+        font-size: 1.25em;
+        padding: 0.75em;
+      }
+
+      #instructions {
+        max-width: 800px;
+      }
+
+      h2 {
+        margin-top: 2em;
+      }
+
+      #jar {
+        border-radius: 0.25em;
+        background-color: #eee;
+        max-width: 800px;
+        padding: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Penny Jar Example dApp</h1>
+    <div id="instructions">
+      <p>
+        This app implements a simple "penny jar". You can do two things with it:
+      </p>
+      <ol>
+        <li>
+          <b>Donate Pennies</b>. When you donate any amount of ETH, you also get
+          to change the current message that's written on the jar.
+        </li>
+        <li>
+          <b>Take Pennies</b>. You're allowed to take up to half of the pennies
+          in the jar.
+        </li>
+      </ol>
+      <p>
+        If you're looking at this on the web, rather than on your local dev box,
+        then this jar lives on the <b>Ropsten Test Network</b>. Make sure
+        <a href="https://metamask.io/">MetaMask</a> is installed, and then get
+        some ETH for one of your Ethereum accounts by visiting a
+        <a
+          href="https://www.google.com/search?q=ropsten+faucet&oq=ropsten+faucet"
+          >Ropsten Faucet</a
+        >.
+      </p>
+    </div>
+
+    <h2>The Jar Itself!</h2>
+
+    <div id="jar">
+      <p><b>Current ETH in the jar:</b>&nbsp;<span id="jar-value"></span></p>
+      <p>
+        <b>Current message on the jar:</b>&nbsp;<span id="jar-message"></span>
+      </p>
+    </div>
+
+    <script src="./js/penny.js"></script>
+  </body>
+</html>
