@@ -23,6 +23,17 @@
         max-width: 800px;
         padding: 1em;
       }
+
+      button {
+        cursor: pointer;
+        font-size: 1.1em;
+        padding: 0.5em;
+        border-radius: 0.25em;
+      }
+
+      button:hover {
+        background-color: #ccc;
+      }
     </style>
   </head>
   <body>
@@ -53,6 +64,10 @@
       </p>
     </div>
 
+    <h2>MetaMask Connection</h2>
+
+    <button id="connect"></button>
+
     <h2>The Jar Itself!</h2>
 
     <div id="jar">
@@ -60,6 +75,8 @@
       <p>
         <b>Current message on the jar:</b>&nbsp;<span id="jar-message"></span>
       </p>
+      <button id="donate">Donate to the jar</button>
+      <button id="take">Take from the jar</button>
     </div>
 
     <script src="./js/penny.js"></script>

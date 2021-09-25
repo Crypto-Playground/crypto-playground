@@ -6,7 +6,9 @@
   "scripts": {
     "test:penny": "cd penny && npx hardhat test",
     "build:penny": "echo \"TODO dave\"",
-    "dev:penny": "cd penny && npx esbuild src/penny.ts --servedir=public --outdir=public/js --bundle"
+    "dev:penny:web": "cd penny && npx esbuild src/penny.ts --servedir=public --outdir=public/js --bundle",
+    "dev:penny:chain": "cd penny && npx hardhat node",
+    "dev:penny:deploy": "cd penny && npx hardhat script ./scripts/deploy-penny-jar.ts --network localhost"
   },
   "author": "Dave Peck <davepeck@davepeck.org>",
   "license": "MIT",
