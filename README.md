@@ -1,6 +1,6 @@
 # Crypto Playground
 
-This is a place for me to work on random decentralized apps.
+This is a place for me to learn about decentralized app development.
 
 Currently, they are:
 
