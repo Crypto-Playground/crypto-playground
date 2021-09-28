@@ -1,6 +1,8 @@
 # Crypto Playground
 
-This is a place for me to learn about decentralized app development. What are blockchains good for? I remain skeptical that they're good for much beyond grift, but let's dig into the technology to be sure.
+This is a place for me to learn about decentralized app development. 
+
+What are blockchains good for? Are they good for much beyond grift? I'm exploring the ecosystem, but this repository probably won't be of interest to many others.
 
 Here you will find:
 
