@@ -34,6 +34,13 @@
       button:hover {
         background-color: #ccc;
       }
+
+      input[type=text] {
+        border-radius: 0.25em;
+        padding: 0.5em;
+        font-size: 1.25em;
+        width: 42ch;
+      }
     </style>
   </head>
   <body>
@@ -64,6 +71,12 @@
       </p>
     </div>
 
+    <h2>PennyJar Smart Contract Address</h2>
+
+    <input type="text" id="address" value="0x5fbdb2315678afecb367f032d93f642f64180aa3" />
+
+    <p>(This works on the Ropsten network; update this before connecting if you're running on some other blockchain.)</p>
+
     <h2>MetaMask Connection</h2>
 
     <button id="connect"></button>
@@ -71,7 +84,7 @@
     <h2>The Jar Itself!</h2>
 
     <div id="jar">
-      <p><b>Current ETH in the jar:</b>&nbsp;<span id="jar-value"></span></p>
+      <p><b>Current ETH in the jar:</b>&nbsp;<span id="jar-balance"></span></p>
       <p>
         <b>Current message on the jar:</b>&nbsp;<span id="jar-message"></span>
       </p>
