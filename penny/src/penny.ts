@@ -1,9 +1,5 @@
 import { ethers } from "ethers";
 
-const connectButton = document.getElementById("connect") as HTMLButtonElement;
-const donateButton = document.getElementById("donate") as HTMLButtonElement;
-const takeButton = document.getElementById("take") as HTMLButtonElement;
-
 // PennyJar smart contract ABI -- this is found in
 // artifacts/contracts/PennyJar.sol/PennyJar.json
 // and you need to update it if you change and recompile PennyJar.sol
@@ -87,9 +83,9 @@ const getJarContractAddress = (): string => {
 
 /** Get a wrapper around the current PennyJar contract. */
 const getJarContract = (
-  provider: ethers.providers.Web3Provider
+  providerOrSigner: ethers.providers.Web3Provider | ethers.Signer
 ): ethers.Contract =>
-  new ethers.Contract(getJarContractAddress(), PENNY_JAR_ABI, provider);
+  new ethers.Contract(getJarContractAddress(), PENNY_JAR_ABI, providerOrSigner);
 
 /** Get the jar balance as a formatted string. */
 const getJarBalance = async (
@@ -128,14 +124,36 @@ const updateJar = async (
   await updateJarMessage(provider);
 };
 
+/** Donate to the jar. */
+const donate = async (
+  provider: ethers.providers.Web3Provider,
+  amountEth: ethers.BigNumber,
+  message: string
+): Promise<void> => {
+  const jar = getJarContract(provider.getSigner());
+  const donateResponse: ethers.providers.TransactionResponse =
+    await jar.donatePennies(message, {
+      value: amountEth,
+    });
+  const donateReceipt: ethers.providers.TransactionReceipt =
+    await donateResponse.wait();
+  console.log(donateReceipt);
+};
+
 //
 // Initialization code
 //
 
-// Manage the connect button.
+// Our three buttons
+const connectButton = document.getElementById("connect") as HTMLButtonElement;
+const donateButton = document.getElementById("donate") as HTMLButtonElement;
+const takeButton = document.getElementById("take") as HTMLButtonElement;
+
+// Global state
 let connected: boolean = false;
 let provider: ethers.providers.Web3Provider | null = null;
 
+// Hook up the "Connect to Ethereum" button
 connectButton.innerText = isEthereumProviderInstalled()
   ? "Connect to Ethereum"
   : "Click here to install MetaMask";
@@ -165,4 +183,29 @@ connectButton.onclick = async (e: MouseEvent) => {
   connected = true;
 
   updateJar(provider);
+};
+
+// Hook up the "Donate to the jar" button
+donateButton.onclick = async (e: MouseEvent) => {
+  e.preventDefault();
+
+  // Don't do anything if we're not connected.
+  if (!connected) return;
+
+  try {
+    const amount = prompt(
+      "How much would you like to donate (in Eth)?",
+      "0.25"
+    );
+    const amountEth = ethers.utils.parseEther(amount);
+    const message = prompt(
+      "What would you like the new message to be?",
+      await getJarMessage(provider)
+    );
+
+    await donate(provider, amountEth, message);
+    updateJar(provider);
+  } catch (e) {
+    alert(e);
+  }
 };
