@@ -16,6 +16,9 @@ contract PennyJar {
     // here!
     string private _message;
 
+    event PenniesDonated(address by, uint256 amount, string message);
+    event PenniesTaken(address by, uint256 amount);
+
     constructor(string memory message) {
         // console.log("Deploying a PennyJar using message:", message);
         _message = message;
@@ -43,6 +46,7 @@ contract PennyJar {
         //     newMessage
         // );
         _message = newMessage;
+        emit PenniesDonated(msg.sender, msg.value, newMessage);
     }
 
     function takePennies(uint256 amount) public {
@@ -59,5 +63,6 @@ contract PennyJar {
         );
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         require(success, "Unable to hand you pennies; sorry!");
+        emit PenniesTaken(msg.sender, amount);
     }
 }

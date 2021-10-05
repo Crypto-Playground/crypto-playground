@@ -6,8 +6,12 @@ import type {
   BigNumber,
 } from "ethers";
 import { assert, expect } from "chai";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("PennyJar", () => {
+  /** One quarter ETH, in wei. */
+  const ETH_025 = ethers.utils.parseEther("0.25");
+
   /** One ETH, in wei. */
   const ETH_1 = ethers.utils.parseEther("1.0");
 
@@ -33,7 +37,7 @@ describe("PennyJar", () => {
   });
 
   describe("donatePennies()", () => {
-    it("Should demand a donation", async () => {
+    it("should fail with a zero donation", async () => {
       const pennyJar = await deploy("hi");
 
       try {
@@ -45,28 +49,41 @@ describe("PennyJar", () => {
       }
     });
 
-    it("Should update the message", async () => {
-      const pennyJar = await deploy("initial message");
+    describe("success cases", () => {
+      let pennyJar: Contract;
+      let donateTxn: ContractTransaction;
 
-      // Donate 1ETH to the Penny Jar
-      const donateTxn: ContractTransaction = await pennyJar.donatePennies(
-        "updated message",
-        { value: ETH_1 }
-      );
-      await donateTxn.wait();
+      beforeEach(async () => {
+        pennyJar = await deploy("initial");
+        // Donate 1ETH to the Penny Jar
+        donateTxn = await pennyJar.donatePennies("updated", {
+          value: ETH_1,
+        });
+        await donateTxn.wait();
+      });
 
-      // Make sure we successfully updated the penny jar's message
-      const message: string = await pennyJar.getMessage();
-      expect(message).to.equal("updated message");
+      it("should update the message", async () => {
+        // Make sure we successfully updated the penny jar's message
+        const message: string = await pennyJar.getMessage();
+        expect(message).to.equal("updated");
+      });
 
-      // Make sure the penny jar contract has 1ETH!
-      const newBalance = await pennyJar.provider.getBalance(pennyJar.address);
-      expect(newBalance).to.equal(ETH_1);
+      it("should have a new balance", async () => {
+        // Make sure the penny jar contract has 1ETH!
+        const newBalance = await pennyJar.provider.getBalance(pennyJar.address);
+        expect(newBalance).to.equal(ETH_1);
+      });
+
+      it("should emit the PenniesDonated event", async () => {
+        expect(donateTxn)
+          .to.emit(pennyJar, "PenniesDonated")
+          .withArgs(await pennyJar.signer.getAddress(), ETH_1, "updated");
+      });
     });
   });
 
   describe("takePennies()", () => {
-    it("Should prevent pennies from being taken when there are none.", async () => {
+    it("should fail when there are no pennies", async () => {
       const pennyJar = await deploy("test");
 
       try {
@@ -81,7 +98,7 @@ describe("PennyJar", () => {
       }
     });
 
-    it("Should prevent too many pennies from being taken.", async () => {
+    it("should fail when too many pennies are taken", async () => {
       const pennyJar = await deploy("test");
 
       const [owner, addr1, addr2] = await ethers.getSigners();
@@ -105,40 +122,59 @@ describe("PennyJar", () => {
       }
     });
 
-    it("Should allow a sensible number of pennies to be taken.", async () => {
-      const pennyJar = await deploy("test");
+    describe("success cases", () => {
+      let pennyJar: Contract;
+      let taker: SignerWithAddress;
+      let takeTxn: ContractTransaction;
+      let takeTxnReceipt: ContractReceipt;
+      let takerInitialBalance: BigNumber;
 
-      const [owner, addr1, addr2] = await ethers.getSigners();
+      beforeEach(async () => {
+        pennyJar = await deploy("initial");
 
-      // Donate 1 ETH to the penny jar
-      const donateTxn: ContractTransaction = await pennyJar.donatePennies(
-        "test2",
-        { value: ETH_1 }
-      );
-      await donateTxn.wait();
+        taker = (await ethers.getSigners())[2];
 
-      // Grab the initial balance of the account that's going to *take* pennies
-      const takerInitialBalance = await addr2.getBalance();
+        // Donate 1 ETH to the penny jar
+        const donateTxn: ContractTransaction = await pennyJar.donatePennies(
+          "test2",
+          { value: ETH_1 }
+        );
+        await donateTxn.wait();
 
-      // Take 0.25 ETH from the penny jar
-      const takeTxn: ContractTransaction = await pennyJar
-        .connect(addr2)
-        .takePennies(ethers.utils.parseEther("0.25"));
-      const receipt: ContractReceipt = await takeTxn.wait();
+        // Grab the initial balance of the account that's going to *take* pennies
+        takerInitialBalance = await taker.getBalance();
 
-      // Ensure that the account that took pennies has a sensible final
-      // balance, namely 0.25ETH - whatever we spent on gas
-      const takerFinalBalance = await addr2.getBalance();
-      const gasCost = receipt.gasUsed.mul(receipt.effectiveGasPrice);
-      expect(takerFinalBalance.sub(takerInitialBalance).add(gasCost)).to.equal(
-        ethers.utils.parseEther("0.25")
-      );
+        // Take 0.25 ETH from the penny jar
+        takeTxn = await pennyJar.connect(taker).takePennies(ETH_025);
+        takeTxnReceipt = await takeTxn.wait();
+      });
 
-      // Ensure that the penny jar is left with exactly 0.75 ETH
-      const pennyJarBalance = await pennyJar.provider.getBalance(
-        pennyJar.address
-      );
-      expect(pennyJarBalance).to.equal(ethers.utils.parseEther("0.75"));
+      it("should leave a sensible balance with the taker", async () => {
+        // Ensure that the account that took pennies has a sensible final
+        // balance, namely 0.25ETH - whatever we spent on gas
+        const takerFinalBalance = await taker.getBalance();
+        const gasCost = takeTxnReceipt.gasUsed.mul(
+          takeTxnReceipt.effectiveGasPrice
+        );
+        expect(
+          takerFinalBalance.sub(takerInitialBalance).add(gasCost)
+        ).to.equal(ETH_025);
+      });
+
+      it("should leave a sensible balance in the jar", async () => {
+        // Ensure that the penny jar is left with exactly 0.75 ETH
+        const pennyJarBalance = await pennyJar.provider.getBalance(
+          pennyJar.address
+        );
+        expect(pennyJarBalance).to.equal(ethers.utils.parseEther("0.75"));
+      });
+
+      it("should emit the PenniesTaken event", async () => {
+        // Ensure that we emitted the PenniesTaken event
+        expect(takeTxn)
+          .to.emit(pennyJar, "PenniesTaken")
+          .withArgs(await taker.getAddress(), ETH_025);
+      });
     });
   });
 });
