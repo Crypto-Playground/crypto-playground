@@ -4,3 +4,6 @@ node_modules
 #Hardhat files
 cache
 artifacts
+
+#Local config for deployment to real networks
+hardhat.config.secret.ts

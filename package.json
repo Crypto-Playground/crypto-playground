@@ -8,7 +8,8 @@
     "build:penny": "cd penny && npx hardhat compile",
     "dev:penny:web": "cd penny && npx esbuild src/penny.ts --servedir=public --outdir=public/js --bundle",
     "dev:penny:chain": "cd penny && npx hardhat node",
-    "dev:penny:deploy": "cd penny && npx hardhat run ./scripts/deploy-penny-jar.ts --network localhost"
+    "dev:penny:deploy": "cd penny && npx hardhat run ./scripts/deploy-penny-jar.ts --network localhost",
+    "ropsten:penny:deploy": "cd penny && npx hardhat run ./scripts/deploy-penny-jar.ts --network ropsten"
   },
   "author": "Dave Peck <davepeck@davepeck.org>",
   "license": "MIT",
