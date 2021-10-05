@@ -1,7 +1,9 @@
 # Crypto Playground
 
-This is a place for me to work on random decentralized apps.
+This is a place for me to learn about decentralized app development. 
 
-Currently, they are:
+What are blockchains good for? Are they good for much beyond grift? I'm exploring the ecosystem, but this repository probably won't be of interest to many others.
 
-- [Penny Jar](./penny/README.md). The example dApp covered in my Command-Line Crypto 02 video.
+Here you will find:
+
+- [Penny Jar](./penny/README.md). A minimal not-quite-hello-world example dApp for Ethereum.
