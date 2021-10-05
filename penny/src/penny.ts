@@ -125,7 +125,7 @@ const updateJar = async (
 };
 
 /** Donate to the jar. */
-const donate = async (
+const donatePennies = async (
   provider: ethers.providers.Web3Provider,
   amountEth: ethers.BigNumber,
   message: string
@@ -138,6 +138,32 @@ const donate = async (
   const donateReceipt: ethers.providers.TransactionReceipt =
     await donateResponse.wait();
   console.log(donateReceipt);
+};
+
+/** Take from the jar. */
+const takePennies = async (
+  provider: ethers.providers.Web3Provider,
+  amountEth: ethers.BigNumber
+): Promise<void> => {
+  const jar = getJarContract(provider.getSigner());
+  const takeResponse: ethers.providers.TransactionResponse =
+    await jar.takePennies(amountEth);
+  const takeReceipt: ethers.providers.TransactionReceipt =
+    await takeResponse.wait();
+  console.log(takeReceipt);
+};
+
+/** Get a single human-readable string describing an error. */
+const getErrorMessage = (e: unknown): string => {
+  // errors/exceptions from metamask and ethers look a bit different;
+  // sometimes they have a top-level message; sometimes they have an
+  // embedded message inside `data`, as when the transaction fails on-chain.
+  const { message, data } = e as {
+    message?: string;
+    data?: { message?: string };
+  };
+  const { message: dataMessage } = data ?? {};
+  return dataMessage || message || e.toString();
 };
 
 //
@@ -189,23 +215,49 @@ connectButton.onclick = async (e: MouseEvent) => {
 donateButton.onclick = async (e: MouseEvent) => {
   e.preventDefault();
 
-  // Don't do anything if we're not connected.
+  // Don't do anything if we're not connected to an Eth provider, like MetaMask.
   if (!connected) return;
 
   try {
-    const amount = prompt(
+    const amount: string | null = prompt(
       "How much would you like to donate (in Eth)?",
       "0.25"
     );
+    if (amount === null) return;
     const amountEth = ethers.utils.parseEther(amount);
-    const message = prompt(
+    const message: string | null = prompt(
       "What would you like the new message to be?",
       await getJarMessage(provider)
     );
+    if (message === null) return;
 
-    await donate(provider, amountEth, message);
+    await donatePennies(provider, amountEth, message);
     updateJar(provider);
   } catch (e) {
-    alert(e);
+    console.error(e);
+    alert(getErrorMessage(e));
+  }
+};
+
+// Hook up the "Take from the jar" button
+takeButton.onclick = async (e: MouseEvent) => {
+  e.preventDefault();
+
+  // Don't do anything if we're not connected to an Eth provider, like MetaMask.
+  if (!connected) return;
+
+  try {
+    const amount: string | null = prompt(
+      "How much would you like to take from the jar (in Eth)?",
+      "0.25"
+    );
+    if (amount === null) return;
+    const amountEth = ethers.utils.parseEther(amount);
+
+    await takePennies(provider, amountEth);
+    updateJar(provider);
+  } catch (e) {
+    console.error(e);
+    alert(getErrorMessage(e));
   }
 };
