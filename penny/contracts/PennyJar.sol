@@ -15,6 +15,7 @@ contract PennyJar {
     // we saw in the Command-Line Crypto #01 video? Solidity sure is using them
     // here!
     string private _message;
+    mapping(address => uint16) public _takes;
 
     event PenniesDonated(address by, uint256 amount, string message);
     event PenniesTaken(address by, uint256 amount);
@@ -39,6 +40,8 @@ contract PennyJar {
             msg.value > 0,
             "You must add ETH to the penny jar when donating."
         );
+        // reset the number of allowed takes
+        _takes[msg.sender] = 0;
         // console.log(
         //     "'%d' wei was donated; changing message from '%s' to '%s'",
         //     msg.value,
@@ -61,8 +64,13 @@ contract PennyJar {
             amount <= address(this).balance / 2,
             "Don't take more than half the pennies in the jar!"
         );
+        require(
+            _takes[msg.sender] < 2,
+            "Please donate after taking twice!"
+        );
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         require(success, "Unable to hand you pennies; sorry!");
+        _takes[msg.sender] = _takes[msg.sender] + 1;
         emit PenniesTaken(msg.sender, amount);
     }
 }

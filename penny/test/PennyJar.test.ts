@@ -9,6 +9,9 @@ import { assert, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("PennyJar", () => {
+  /** Not very much ETH, in wei. */
+  const ETH_0025 = ethers.utils.parseEther("0.025");
+
   /** One quarter ETH, in wei. */
   const ETH_025 = ethers.utils.parseEther("0.25");
 
@@ -118,6 +121,36 @@ describe("PennyJar", () => {
         await takeTxn.wait();
         assert(false);
       } catch {
+        assert(true);
+      }
+    });
+
+    it("should fail if we've taken too many times", async () => {
+      const pennyJar = await deploy("test");
+
+      const [owner, addr1, addr2] = await ethers.getSigners();
+
+      // Donate 1 ETH to the penny jar
+      const donateTxn: ContractTransaction = await pennyJar.donatePennies(
+        "test2",
+        { value: ETH_1 }
+      );
+      await donateTxn.wait();
+
+      // ZERO: Take 0.025 ETH from the penny jar
+      const take0txn = await pennyJar.connect(addr2).takePennies(ETH_0025);
+      await take0txn.wait();
+
+      // ONE: Take 0.025 ETH from the penny jar
+      const take1txn = await pennyJar.connect(addr2).takePennies(ETH_0025);
+      await take1txn.wait();
+
+      try {
+        // TWO: Take 0.025 ETH from the penny jar
+        const take2txn = await pennyJar.connect(addr2).takePennies(ETH_0025);
+        await take2txn.wait();
+        assert(false);
+      } catch (e) {
         assert(true);
       }
     });
