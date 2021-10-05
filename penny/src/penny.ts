@@ -16,6 +16,50 @@ const PENNY_JAR_ABI = [
     type: "constructor",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "by",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "message",
+        type: "string",
+      },
+    ],
+    name: "PenniesDonated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "by",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "PenniesTaken",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "string",
@@ -98,6 +142,24 @@ const getJarMessage = async (
   provider: ethers.providers.Web3Provider
 ): Promise<string> => await getJarContract(provider).getMessage();
 
+/** Get an array of historical donatins and takes to the jar. */
+const getJarDonationHistory = async (
+  provider: ethers.providers.Web3Provider
+): Promise<string[]> => {
+  const jar = getJarContract(provider);
+  const donateFilter = jar.filters.PenniesDonated();
+  const donateEvents = await jar.queryFilter(donateFilter);
+  return donateEvents.map((donateEvent) => {
+    const ethDonated = ethers.utils.formatEther(donateEvent.args.amount);
+    const donatedBy = donateEvent.args.by;
+    const newMessage = donateEvent.args.message;
+    return `On block number ${donateEvent.blockNumber}, ${donatedBy.slice(
+      0,
+      8
+    )}... donated ${ethDonated}ETH with message '${newMessage}'`;
+  });
+};
+
 /** Update the jar value in our HTML. */
 const updateJarBalance = async (
   provider: ethers.providers.Web3Provider
@@ -116,12 +178,21 @@ const updateJarMessage = async (
   );
 };
 
+/** Update the historical donations to the jar. */
+const updateJarDonationHistory = async (
+  provider: ethers.providers.Web3Provider
+): Promise<void> => {
+  const historyElement = document.getElementById("jar-donation-history");
+  historyElement.replaceChildren(...(await getJarDonationHistory(provider)));
+};
+
 /** Update the jar status. */
 const updateJar = async (
   provider: ethers.providers.Web3Provider
 ): Promise<void> => {
   await updateJarBalance(provider);
   await updateJarMessage(provider);
+  await updateJarDonationHistory(provider);
 };
 
 /** Donate to the jar. */
